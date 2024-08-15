@@ -1,0 +1,113 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+public class Student
+{
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public DateTime DateOfBirth { get; set; }
+    public List<int> Grades { get; set; }
+
+    public Student(string firstName, string lastName, DateTime dateOfBirth, List<int> grades)
+    {
+        FirstName = firstName;
+        LastName = lastName;
+        DateOfBirth = dateOfBirth;
+        Grades = grades;
+    }
+
+    public double GetAverageGrade()
+    {
+        return Grades.Average();
+    }
+
+    public override string ToString()
+    {
+        return $"{FirstName} {LastName}, Date of Birth: {DateOfBirth.ToShortDateString()}, Average Grade: {GetAverageGrade():F2}";
+    }
+}
+
+public class University
+{
+    public List<Student> Students { get; set; }
+
+    public University()
+    {
+        Students = new List<Student>();
+    }
+
+    public void AddStudent(Student student)
+    {
+        Students.Add(student);
+    }
+
+    public void PrintAllStudents()
+    {
+        foreach (var student in Students)
+        {
+            Console.WriteLine(student);
+        }
+    }
+
+    public void PrintAllStudentsAlphabetically()
+    {
+        var sortedStudents = Students.OrderBy(s => s.FirstName).ThenBy(s => s.LastName);
+        foreach (var student in sortedStudents)
+        {
+            Console.WriteLine(student);
+        }
+    }
+
+    public Student GetTopStudent()
+    {
+        return Students.OrderByDescending(s => s.GetAverageGrade()).FirstOrDefault();
+    }
+
+    public List<Student> FindStudentsByName(string name)
+    {
+        return Students.Where(s => s.FirstName.Equals(name, StringComparison.OrdinalIgnoreCase)).ToList();
+    }
+
+    public List<Student> FindBirthdayStudents(DateTime date)
+    {
+        return Students.Where(s => s.DateOfBirth.Month == date.Month && s.DateOfBirth.Day == date.Day).ToList();
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        University university = new University();
+
+        university.AddStudent(new Student("Ivan", "Ivanov", new DateTime(2000, 5, 15), new List<int> { 85, 90, 78 }));
+        university.AddStudent(new Student("Petr", "Petrov", new DateTime(1999, 6, 20), new List<int> { 90, 92, 88 }));
+        university.AddStudent(new Student("Maria", "Sidorova", new DateTime(2001, 5, 15), new List<int> { 75, 80, 82 }));
+        university.AddStudent(new Student("Ivan", "Semenov", new DateTime(1998, 12, 25), new List<int> { 95, 85, 90 }));
+
+        Console.WriteLine("All Students:");
+        university.PrintAllStudents();
+
+        Console.WriteLine("\nAll Students Alphabetically:");
+        university.PrintAllStudentsAlphabetically();
+
+        Console.WriteLine("\nTop Student:");
+        var topStudent = university.GetTopStudent();
+        Console.WriteLine(topStudent);
+
+        Console.WriteLine("\nFind Students by Name:");
+        var studentsNamedIvan = university.FindStudentsByName("Ivan");
+        foreach (var student in studentsNamedIvan)
+        {
+            Console.WriteLine(student);
+        }
+
+        Console.WriteLine("\nBirthday Students:");
+        var birthdayStudents = university.FindBirthdayStudents(new DateTime(2023, 5, 15));
+        foreach (var student in birthdayStudents)
+        {
+            Console.WriteLine(student);
+        }
+    }
+}
